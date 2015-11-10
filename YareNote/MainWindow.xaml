@@ -7,9 +7,6 @@
         mc:Ignorable="d"
         Title="YareNote" Height="400" Width="600">
     <Grid>
-        <Grid>
-            <TextBox x:Name="textBox" AcceptsReturn="True"/>
-
-        </Grid>
+        <TextBox x:Name="textBox" AcceptsReturn="True" BorderThickness="0" Margin="5" FontSize="16"/>
     </Grid>
 </Window>

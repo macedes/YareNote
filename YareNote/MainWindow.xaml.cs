@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using System.Runtime.InteropServices;
 using System.Windows.Interop;
 using System.ComponentModel;
+using System.IO;
 
 namespace YareNote
 {
@@ -31,27 +32,25 @@ namespace YareNote
 
         private const int HOTKEY_ID = 9000;
 
-        //Modifiers:
-        private const uint MOD_NONE = 0x0000; //(none)
-        private const uint MOD_ALT = 0x0001; //ALT
+        //CTRL Modifier:
         private const uint MOD_CONTROL = 0x0002; //CTRL
-        private const uint MOD_SHIFT = 0x0004; //SHIFT
-        private const uint MOD_WIN = 0x0008; //WINDOWS
-        //CAPS LOCK:
-        private const uint VK_CAPITAL = 0x20;
+
         //SPACEBAR
         private const uint VK_SPACE = 0x20;
         public MainWindow()
         {
             InitializeComponent();
             textBox.Focus();
-            this.PreviewKeyDown += new KeyEventHandler(HandleEsc);
+            string text = ReadText();
+            textBox.Text = text;
+            textBox.Select(textBox.Text.Length, 0);
+            PreviewKeyDown += new KeyEventHandler(HandleEsc);
         }
 
         private void HandleEsc(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
-                Close();
+                this.WindowState = WindowState.Minimized;
         }
 
         private IntPtr _windowHandle;
@@ -63,8 +62,8 @@ namespace YareNote
             _windowHandle = new WindowInteropHelper(this).Handle;
             _source = HwndSource.FromHwnd(_windowHandle);
             _source.AddHook(HwndHook);
-
-            RegisterHotKey(_windowHandle, HOTKEY_ID, MOD_CONTROL, VK_CAPITAL); //CTRL + CAPS_LOCK
+            
+            RegisterHotKey(_windowHandle, HOTKEY_ID, MOD_CONTROL, VK_SPACE); //CTRL + SPACE
         }
 
         private IntPtr HwndHook(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
@@ -77,9 +76,8 @@ namespace YareNote
                     {
                         case HOTKEY_ID:
                             int vkey = (((int)lParam >> 16) & 0xFFFF);
-                            if (vkey == VK_CAPITAL)
+                            if (vkey == VK_SPACE)
                             {
-                                
                                         WindowState = WindowState.Normal;
                                         Activate();
                                         textBox.Focus();
@@ -96,7 +94,23 @@ namespace YareNote
         {
             _source.RemoveHook(HwndHook);
             UnregisterHotKey(_windowHandle, HOTKEY_ID);
+            SaveText(textBox.Text);
             base.OnClosed(e);
+        }
+
+        private void SaveText(string content)
+        {
+            File.WriteAllText("YareNote.txt", content);
+        }
+
+        private string ReadText()
+        {
+            string text = "";
+            if (File.Exists("YareNote.txt"))
+            {
+                text = File.ReadAllText("YareNote.txt");
+            }
+            return text;
         }
 
     }
