@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:YareNote"
         mc:Ignorable="d"
-        Title="YareNote" Height="350" Width="525">
+        Title="YareNote" Height="400" Width="600">
     <Grid>
         <Grid>
             <TextBox x:Name="textBox" AcceptsReturn="True"/>
